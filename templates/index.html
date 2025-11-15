@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ALPR Advanced - Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  
+  <style>
+    body { font-family: Inter, sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-100 p-6">
+
+<div class="max-w-7xl mx-auto">
+
+  <header class="flex justify-between mb-6">
+    <h1 class="text-3xl font-semibold">ALPR Advanced Dashboard</h1>
+
+    <div class="space-x-3">
+      <a href="/upload" class="px-4 py-2 bg-blue-600 text-white rounded">Upload Video</a>
+      <a href="/download_csv" class="px-4 py-2 bg-green-600 text-white rounded">Download CSV</a>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-12 gap-6">
+
+    <!-- Left Section -->
+    <div class="col-span-8 bg-white p-4 shadow rounded">
+      <h2 class="font-medium mb-2">Live Stream</h2>
+
+      <div class="w-full border rounded overflow-hidden">
+        <img src="/video_feed" class="w-full" id="stream">
+      </div>
+
+      <div class="mt-2 text-sm text-gray-600">
+        FPS: <span id="fps">0</span>
+      </div>
+    </div>
+
+    <!-- Right Section -->
+    <div class="col-span-4 bg-white p-4 shadow rounded">
+      <h2 class="font-medium mb-2">Recent Detections</h2>
+
+      <div id="records" class="space-y-3 max-h-96 overflow-y-auto"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+async function fetchStatus() {
+  let res = await fetch("/get_status");
+  let data = await res.json();
+
+  document.getElementById("fps").innerText = data.fps;
+
+  let html = "";
+  data.recent_records.forEach(rec => {
+    html += `
+      <div class="flex gap-3 p-2 border rounded items-center">
+        <img src="/${rec.image_path}" class="w-16 h-12 object-cover rounded">
+        <div>
+          <div class="font-semibold">${rec.vehicle_type} <span class="text-gray-500">${rec.color}</span></div>
+          <div class="text-sm">Plate: ${rec.plate} 
+            ${rec.plate_valid ? "<span class='text-green-600'>✓</span>" : "<span class='text-red-600'>✗</span>"}
+          </div>
+          <div class="text-xs text-gray-500">${rec.timestamp}</div>
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById("records").innerHTML = html;
+}
+
+setInterval(fetchStatus, 1200);
+fetchStatus();
+</script>
+
+</body>
+</html>

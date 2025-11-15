@@ -1,0 +1,11 @@
+flask
+flask-socketio
+eventlet
+ultralytics
+easyocr
+opencv-python
+scikit-learn
+pandas
+openpyxl
+werkzeug
+numpy
